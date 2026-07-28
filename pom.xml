@@ -13,4 +13,4 @@
     <enabled>true</enabled>
   </snapshots>
 </repository>
-</repositories> <dependencies> <dependency> <groupId>io.papermc.paper</groupId> <artifactId>paper-api</artifactId> <version>1.26.2-R0.1</version> <scope>provided</scope> </dependency> </dependencies> </project>
+</repositories> <dependency> <groupId>io.papermc.paper</groupId> <artifactId>paper-api</artifactId> <version>26.2.build.87-stable</version> <scope>provided</scope> </dependency> </project>
