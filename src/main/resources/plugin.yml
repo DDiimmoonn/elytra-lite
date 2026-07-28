@@ -1,0 +1,12 @@
+name: ElytraSpeed
+main: ru.ddiimmoonn.elytraspeed.ElytraSpeedPlugin
+version: 1.0
+api-version: 1.20
+commands:
+  gelytra:
+    description: Выдать элитру нужного уровня
+    usage: /gelytra <ник> <уровень>
+    permission: elytraspeed.give
+permissions:
+  elytraspeed.give:
+    default: op
