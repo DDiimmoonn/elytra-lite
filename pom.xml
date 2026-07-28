@@ -1,16 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"> <modelVersion>4.0.0</modelVersion> <groupId>ru.ddiimmoonn</groupId> <artifactId>elytra-speed</artifactId> <version>1.0</version> <packaging>jar</packaging> <name>ElytraSpeed</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ru.ddiimmoonn</groupId>
+  <artifactId>elytra-speed</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>ElytraSpeed</name>
 
-<properties> <java.version>17</java.version> <maven.compiler.source>${java.version}</maven.compiler.source> <maven.compiler.target>${java.version}</maven.compiler.target> </properties> <repositories> <!-- PaperMC public repo (contains releases) --> <repository> <id>papermc-public</id> <url>https://repo.papermc.io/repository/maven-public/</url> <releases> <enabled>true</enabled> </releases> <snapshots> <enabled>false</enabled> </snapshots> </repository>
-<!-- PaperMC snapshots (для SNAPSHOT-артефактов) -->
-<repository>
-  <id>papermc-snapshots</id>
-  <url>https://repo.papermc.io/repository/maven-snapshots/</url>
-  <releases>
-    <enabled>false</enabled>
-  </releases>
-  <snapshots>
-    <enabled>true</enabled>
-  </snapshots>
-</repository>
-</repositories> <dependency> <groupId>io.papermc.paper</groupId> <artifactId>paper-api</artifactId> <version>26.2.build.87-stable</version> <scope>provided</scope> </dependency> </project>
+  <properties>
+    <java.version>17</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+  </properties>
+
+  <repositories>
+    <!-- PaperMC public repo (contains releases) -->
+    <repository>
+      <id>papermc-public</id>
+      <url>https://repo.papermc.io/repository/maven-public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <!-- PaperMC snapshots (на случай SNAPSHOT версий) -->
+    <repository>
+      <id>papermc-snapshots</id>
+      <url>https://repo.papermc.io/repository/maven-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>26.2.build.87-stable</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>
