@@ -1,0 +1,8 @@
+# Config for ElytraSpeed
+# multipliers: list of 5 numbers for levels 1..5
+multipliers:
+  - 0.5
+  - 0.7
+  - 0.9
+  - 1.1
+  - 1.3
