@@ -24,32 +24,31 @@ public class GlideListener implements Listener {
         if (isGliding) {
             GlideState st = plugin.gliders.get(id);
             if (st == null) {
-                // игрок только начал планировать — добавляем
-                int level = 1;
-                try {
-                    level = ItemUtils.getElytraLevel(p.getInventory().getChestplate(), plugin);
-                } catch (Exception ignored) {}
-
-                double baseSpeed = 0.95; // пример значения, подкорректируйте при необходимости
+                // Игрок только начал планировать — добавляем в карту, НЕ включаем планирование вручную
+                int level = ItemUtils.getElytraLevel(p.getInventory().getChestplate(), plugin);
+                if (level <= 0) {
+                    // если нет нашей элитры — не добавляем
+                    return;
+                }
+                double baseSpeed = 0.95;
                 double mult = ItemUtils.levelToMultiplier(level);
                 st = new GlideState(baseSpeed, mult,
                         p.getLocation().getDirection().getX(),
                         p.getLocation().getDirection().getZ());
                 plugin.gliders.put(id, st);
             } else {
-                // обновляем направление, пока игрок планирует
+                // обновляем направление
                 st.dirX = p.getLocation().getDirection().getX();
                 st.dirZ = p.getLocation().getDirection().getZ();
             }
         } else {
-            // если перестал планировать — удаляем
+            // перестал планировать — удаляем
             plugin.gliders.remove(id);
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        // очистка на выходе
         plugin.gliders.remove(event.getPlayer().getUniqueId());
     }
 }
