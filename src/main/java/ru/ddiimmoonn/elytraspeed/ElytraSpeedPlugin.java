@@ -16,17 +16,26 @@ public final class ElytraSpeedPlugin extends JavaPlugin {
     public void onEnable() {
         // загрузка конфигурации (если нет — сохранит дефолтную из resources)
         saveDefaultConfig();
+
+        // Инициализируем ключ для PersistentDataContainer
         LEVEL_KEY = new NamespacedKey(this, "elytra_level");
 
-        // инициализация утилит
+        // Инициализация утилит
         ItemUtils.setPlugin(this);
+        ItemUtils.ensureKey();
 
+        // Регистрируем слушатели
         getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
         getServer().getPluginManager().registerEvents(new GlideListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+
+        // Регистрируем команду (проверьте plugin.yml, чтобы команда была объявлена)
         if (getCommand("gelytra") != null) getCommand("gelytra").setExecutor(new GiveCommand(this));
 
+        // Запускаем планировщик
         scheduler = new GlideScheduler(this, gliders);
         scheduler.start();
+
         getLogger().info("ElytraSpeed enabled");
     }
 
