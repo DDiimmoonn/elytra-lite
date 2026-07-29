@@ -2,61 +2,69 @@ package ru.ddiimmoonn.elytraspeed;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GlideScheduler {
-    private final Plugin plugin;
+    private final JavaPlugin plugin;
     private final ConcurrentHashMap<UUID, GlideState> gliders;
-    private BukkitTask task;
+    private int taskId = -1;
 
-    public GlideScheduler(Plugin plugin, ConcurrentHashMap<UUID, GlideState> gliders) {
+    public GlideScheduler(JavaPlugin plugin, ConcurrentHashMap<UUID, GlideState> gliders) {
         this.plugin = plugin;
         this.gliders = gliders;
     }
 
     public void start() {
-        // запускаем тикер на 1 тик
-        task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1L, 1L);
+        if (taskId != -1) return;
+        // Run every tick
+        taskId = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 1L, 1L).getTaskId();
     }
 
     public void stop() {
-        if (task != null) task.cancel();
+        if (taskId != -1) {
+            Bukkit.getScheduler().cancelTask(taskId);
+            taskId = -1;
+        }
+        gliders.clear();
     }
 
     private void tick() {
-        if (gliders.isEmpty()) return;
-        Iterator<Map.Entry<UUID, GlideState>> it = gliders.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<UUID, GlideState> e = it.next();
+        for (Map.Entry<UUID, GlideState> e : gliders.entrySet()) {
             UUID id = e.getKey();
             GlideState st = e.getValue();
             Player p = Bukkit.getPlayer(id);
-            if (p == null || !p.isOnline() || !p.isGliding()) {
-                it.remove();
+            if (p == null || !p.isOnline()) {
+                gliders.remove(id);
                 continue;
             }
-            // обновляем скорость по направлению игрока, но сохраняем вертикальную компоненту
-            Vector dir = p.getLocation().getDirection();
-            dir.setY(0);
-            if (dir.lengthSquared() < 1e-8) {
-                dir = new Vector(st.dirX, 0, st.dirZ);
-            } else {
-                dir.normalize();
+            if (!p.isGliding()) {
+                // если перестал планировать — убираем
+                gliders.remove(id);
+                continue;
             }
-            double targetSpeed = st.baseSpeed * st.multiplier;
-            Vector vel = p.getVelocity();
-            Vector newVel = new Vector(dir.getX() * targetSpeed, vel.getY(), dir.getZ() * targetSpeed);
-            p.setVelocity(newVel);
-            // обновим кеш направления
-            st.dirX = dir.getX();
-            st.dirZ = dir.getZ();
+
+            // Применяем скоростной эффект, но не меняем состояние планирования
+            // Берём текущее направление и умножаем его на множитель
+            Vector dir = p.getLocation().getDirection().clone();
+            double speed = st.baseSpeed * st.multiplier;
+
+            // Немного сглаживаем — чтобы не создавать читовую тягу, ограничим максимальную скорость
+            double max = 3.0; // безопасный верх (при необходимости уменьшить)
+            Vector vel = dir.multiply(speed);
+            if (vel.length() > max) {
+                vel = vel.normalize().multiply(max);
+            }
+
+            // Сохраняем вертикальную скорость (чтобы не мешать падению/взлёту слишком сильно)
+            double currentY = p.getVelocity().getY();
+            vel.setY(currentY);
+
+            p.setVelocity(vel);
         }
     }
 }
