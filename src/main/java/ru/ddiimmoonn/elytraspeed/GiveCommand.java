@@ -1,5 +1,6 @@
 package ru.ddiimmoonn.elytraspeed;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,20 +16,27 @@ public class GiveCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("This command is for players only.");
-            return true;
+        Player target = null;
+        if (args.length == 0) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Usage: /gelytra <player>");
+                return true;
+            }
+            target = (Player) sender;
+        } else {
+            target = Bukkit.getPlayer(args[0]);
+            if (target == null) {
+                sender.sendMessage("Player not found: " + args[0]);
+                return true;
+            }
         }
-        Player player = (Player) sender;
-        int level = 1;
-        if (args.length > 0) {
-            try {
-                level = Math.max(1, Integer.parseInt(args[0]));
-            } catch (NumberFormatException ignored) {}
+
+        ItemStack el = ItemUtils.createElytra(1); // ВСЕ элитры — уровень 1
+        target.getInventory().addItem(el);
+        sender.sendMessage("Given custom Elytra (level 1) to " + target.getName());
+        if (target != sender && target.isOnline()) {
+            target.sendMessage("You received a custom Elytra (level 1).");
         }
-        ItemStack el = ItemUtils.createElytra(level);
-        player.getInventory().addItem(el);
-        player.sendMessage("Given custom Elytra (level " + level + ").");
         return true;
     }
 }
