@@ -10,19 +10,24 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class ItemUtils {
+    // Опционально хранится плагин, но ключ берём из ElytraSpeedPlugin.LEVEL_KEY
     private static Plugin plugin;
+
+    private ItemUtils() {}
 
     public static void setPlugin(Plugin p) {
         plugin = p;
     }
 
-    // Создать "специальную" элитру с уровнем
+    // Создать "нашу" элитру с level в PersistentDataContainer и lore (имя без уровня)
     public static ItemStack createElytra(int level) {
         ItemStack elytra = new ItemStack(Material.ELYTRA);
         ItemMeta meta = elytra.getItemMeta();
         if (meta == null) return elytra;
+
         meta.setDisplayName(ChatColor.AQUA + "Elytra"); // имя без уровня
 
         List<String> lore = new ArrayList<>();
@@ -39,7 +44,7 @@ public final class ItemUtils {
         return elytra;
     }
 
-    // Проверить — наша ли это элитра (с нашим ключом)
+    // Проверка, является ли предмет нашей элитрой (по ключу)
     public static boolean isCustomElytra(ItemStack item) {
         if (item == null) return false;
         if (item.getType() != Material.ELYTRA) return false;
@@ -50,7 +55,7 @@ public final class ItemUtils {
         return meta.getPersistentDataContainer().has(key, PersistentDataType.INTEGER);
     }
 
-    // Получить уровень (вернёт 0 если не установлено)
+    // Получить уровень элитры (0 если нет)
     public static int getElytraLevel(ItemStack item, Plugin fallback) {
         if (item == null) return 0;
         ItemMeta meta = item.getItemMeta();
@@ -62,25 +67,34 @@ public final class ItemUtils {
         return v == null ? 0 : v;
     }
 
+    // Установить уровень (и обновить lore)
     public static void setElytraLevel(ItemStack item, int level) {
         if (item == null) return;
+        if (item.getType() != Material.ELYTRA) return;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return;
         NamespacedKey key = ElytraSpeedPlugin.LEVEL_KEY;
         if (key != null) {
             meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, level);
-            // обновим lore (имя оставляем без уровня)
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.WHITE + "Level: " + ChatColor.GOLD + level);
-            lore.add(ChatColor.GRAY + "Custom Elytra by ElytraSpeed");
-            meta.setLore(lore);
-            item.setItemMeta(meta);
         }
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.WHITE + "Level: " + ChatColor.GOLD + level);
+        lore.add(ChatColor.GRAY + "Custom Elytra by ElytraSpeed");
+        meta.setLore(lore);
+        item.setItemMeta(meta);
     }
 
-    // Преобразование уровня в множитель скорости (подберите формулу)
+    // Формула преобразования уровня в множитель скорости
     public static double levelToMultiplier(int level) {
-        // пример: +10% скорости за уровень
+        // Базовая логика: +10% к горизонтальной скорости за уровень
+        // При необходимости измените коэффициент
         return 1.0 + (level * 0.10);
+    }
+
+    // Вспомогательный: безопасно установить плагин-ключ, если ElytraSpeedPlugin.LEVEL_KEY ещё не инициализирован
+    public static void ensureKey() {
+        if (ElytraSpeedPlugin.LEVEL_KEY == null && plugin != null) {
+            ElytraSpeedPlugin.LEVEL_KEY = new NamespacedKey(plugin, "elytra_level");
+        }
     }
 }
