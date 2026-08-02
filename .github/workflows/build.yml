@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.advancedelytra'
+version = '1.0.0'
+
+
+repositories {
+
+    mavenCentral()
+
+    maven {
+        name = "Purpur"
+        url = "https://repo.purpurmc.org/snapshots/"
+    }
+}
+
+
+dependencies {
+
+    compileOnly(
+        "org.purpurmc.purpur:purpur-api:1.21.10-R0.1-SNAPSHOT"
+    )
+
+}
+
+
+java {
+
+    toolchain {
+
+        languageVersion = JavaLanguageVersion.of(21)
+
+    }
+
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+
+    options.encoding = "UTF-8"
+
+}
+
+
+jar {
+
+    archiveBaseName = "AdvancedElytra"
+
+}
