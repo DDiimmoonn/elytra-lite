@@ -16,7 +16,7 @@ public class GiveCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player target = null;
+        Player target;
         if (args.length == 0) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage("Usage: /gelytra <player>");
@@ -31,12 +31,10 @@ public class GiveCommand implements CommandExecutor {
             }
         }
 
-        ItemStack el = ItemUtils.createElytra(1); // ВСЕ элитры — уровень 1
+        ItemStack el = ItemUtils.createElytra(1); // всегда L1 по требованию
         target.getInventory().addItem(el);
         sender.sendMessage("Given custom Elytra (level 1) to " + target.getName());
-        if (target != sender && target.isOnline()) {
-            target.sendMessage("You received a custom Elytra (level 1).");
-        }
+        if (target != sender && target.isOnline()) target.sendMessage("You received a custom Elytra (level 1).");
         return true;
     }
 }
