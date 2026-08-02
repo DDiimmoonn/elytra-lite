@@ -1,51 +1,57 @@
-plugins {
-    id 'java'
-}
-
-group = 'ru.advancedelytra'
-version = '1.0.0'
+name: Build AdvancedElytra
 
 
-repositories {
+on:
 
-    mavenCentral()
+  push:
 
-    maven {
-        name = "Purpur"
-        url = "https://repo.purpurmc.org/snapshots/"
-    }
-}
+    branches:
+      - main
 
 
-dependencies {
-
-    compileOnly(
-        "org.purpurmc.purpur:purpur-api:1.21.10-R0.1-SNAPSHOT"
-    )
-
-}
+  workflow_dispatch:
 
 
-java {
 
-    toolchain {
-
-        languageVersion = JavaLanguageVersion.of(21)
-
-    }
-
-}
+jobs:
 
 
-tasks.withType(JavaCompile).configureEach {
-
-    options.encoding = "UTF-8"
-
-}
+  build:
 
 
-jar {
+    runs-on: ubuntu-latest
 
-    archiveBaseName = "AdvancedElytra"
 
-}
+    steps:
+
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+
+        with:
+
+          java-version: '21'
+          distribution: 'temurin'
+
+
+
+      - name: Build
+
+        run: ./gradlew build
+
+
+
+      - name: Upload JAR
+
+        uses: actions/upload-artifact@v4
+
+        with:
+
+          name: AdvancedElytra
+
+          path: build/libs/*.jar
