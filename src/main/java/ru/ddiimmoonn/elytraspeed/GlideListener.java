@@ -24,25 +24,35 @@ public class GlideListener implements Listener {
         if (isGliding) {
             GlideState st = plugin.gliders.get(id);
             if (st == null) {
-                // Игрок только начал планировать — добавляем в карту, НЕ включаем планирование вручную
                 int level = ItemUtils.getElytraLevel(p.getInventory().getChestplate(), plugin);
                 if (level <= 0) {
-                    // если нет нашей элитры — не добавляем
                     return;
                 }
-                double baseSpeed = 0.95;
                 double mult = ItemUtils.levelToMultiplier(level);
-                st = new GlideState(baseSpeed, mult,
-                        p.getLocation().getDirection().getX(),
-                        p.getLocation().getDirection().getZ());
+
+                // Инициализируем currentSpeed: берем текущую горизонтальную скорость игрока или малую долю базовой
+                double curHor = Math.hypot(p.getVelocity().getX(), p.getVelocity().getZ());
+                double fallback = GlideScheduler.BASE_SPEED * 0.18;
+                double initialCurrent = Math.max(curHor, fallback);
+
+                double dirX = p.getLocation().getDirection().getX();
+                double dirZ = p.getLocation().getDirection().getZ();
+
+                if (Math.abs(dirX) < 1e-6 && Math.abs(dirZ) < 1e-6) {
+                    dirX = 0; dirZ = 0;
+                }
+
+                st = new GlideState(GlideScheduler.BASE_SPEED, mult, dirX, dirZ, initialCurrent);
                 plugin.gliders.put(id, st);
             } else {
-                // обновляем направление
-                st.dirX = p.getLocation().getDirection().getX();
-                st.dirZ = p.getLocation().getDirection().getZ();
+                double dirX = p.getLocation().getDirection().getX();
+                double dirZ = p.getLocation().getDirection().getZ();
+                if (!(Math.abs(dirX) < 1e-6 && Math.abs(dirZ) < 1e-6)) {
+                    st.dirX = dirX;
+                    st.dirZ = dirZ;
+                }
             }
         } else {
-            // перестал планировать — удаляем
             plugin.gliders.remove(id);
         }
     }
