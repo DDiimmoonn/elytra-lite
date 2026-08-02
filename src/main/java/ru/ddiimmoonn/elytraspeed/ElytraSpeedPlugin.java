@@ -8,31 +8,30 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class ElytraSpeedPlugin extends JavaPlugin {
     public static NamespacedKey LEVEL_KEY;
-    // Map игроков, которые в полёте -> состояние (baseSpeed, dirX, dirZ, multiplier)
     final ConcurrentHashMap<UUID, GlideState> gliders = new ConcurrentHashMap<>();
     private GlideScheduler scheduler;
 
     @Override
     public void onEnable() {
-        // загрузка конфигурации (если нет — сохранит дефолтную из resources)
         saveDefaultConfig();
 
-        // Инициализируем ключ для PersistentDataContainer
+        // Инициализация ключа PDC
         LEVEL_KEY = new NamespacedKey(this, "elytra_level");
 
         // Инициализация утилит
         ItemUtils.setPlugin(this);
         ItemUtils.ensureKey();
 
-        // Регистрируем слушатели
+        // Регистрация слушателей
         getServer().getPluginManager().registerEvents(new AnvilListener(this), this);
-        getServer().getPluginManager().registerEvents(new GlideListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new GlideListener(this), this);
 
-        // Регистрируем команду (проверьте plugin.yml, чтобы команда была объявлена)
+        // Регистрация команды
         if (getCommand("gelytra") != null) getCommand("gelytra").setExecutor(new GiveCommand(this));
+        else getLogger().warning("Command 'gelytra' not defined in plugin.yml");
 
-        // Запускаем планировщик
+        // Запуск планировщика
         scheduler = new GlideScheduler(this, gliders);
         scheduler.start();
 
