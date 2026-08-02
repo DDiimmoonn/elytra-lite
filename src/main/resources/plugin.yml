@@ -4,8 +4,8 @@ version: 1.0
 api-version: 1.20
 commands:
   gelytra:
-    description: Выдать элитру нужного уровня
-    usage: /gelytra <ник> <уровень>
+    description: Give a custom elytra (level 1) to yourself or player.
+    usage: /gelytra [player]
     permission: elytraspeed.give
 permissions:
   elytraspeed.give:
